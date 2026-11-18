@@ -1,0 +1,3 @@
+# Design direction
+
+A working ledger for Bangladesh food transport contractors. Use white surfaces, a cool light background (#F5F7F8), forest green (#146747), rice gold (#C28A23), deep ink (#172B24), and slate text (#52635C). Noto Sans Bengali supports Bangla; Manrope carries Latin text and tabular numbers. 18px base text, 48px controls, 12px panel radius, 8px control radius. Labels stay above fields. One primary action per form. Desktop uses a quiet sidebar and a broad work area; phones use labeled bottom navigation, stacked cards, and full-width form actions. No decorative gradients, marketing photos, or automatic motion. Status always has words. Errors preserve work. Draft and sync state are explicit. Demo is clearly identified and isolated from live data.

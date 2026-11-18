@@ -1,0 +1,5 @@
+OLD APP/
+node_modules/
+.next/
+package-lock.json
+public/fonts/
