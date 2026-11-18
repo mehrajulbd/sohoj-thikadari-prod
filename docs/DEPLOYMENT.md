@@ -10,6 +10,38 @@
 
 For CLI workflows, link the intended project, commit/review future migrations, and use `supabase db push`. Never reset a production database as an update method.
 
+### Signup error: `Could not find the function public.get_workspace without parameters in the schema cache`
+
+Google authentication and workspace creation are separate steps. This error occurs when the database API cannot find the workspace RPC after authentication. The application intentionally calls `public.get_workspace()` without arguments.
+
+1. Open the Supabase project matching the application's `NEXT_PUBLIC_SUPABASE_URL`. In its SQL Editor, check the schema:
+
+   ```sql
+   select
+     to_regclass('public.organizations') as organizations,
+     to_regclass('public.memberships') as memberships,
+     to_regprocedure('public.get_workspace()') as workspace_function;
+   ```
+
+2. If all three are null and this is the fresh project intended for the app, run the **complete** `supabase/migrations/202611190001_workspace.sql` file. Configuring Google and adding API keys does not install this schema. If only some objects are missing, inspect the migration's original SQL error and repair the incomplete deployment before proceeding; do not rerun the initial migration over existing tables.
+3. If the function exists, verify access:
+
+   ```sql
+   select
+     has_schema_privilege('authenticated', 'public', 'USAGE') as schema_access,
+     has_function_privilege('authenticated', 'public.get_workspace()', 'EXECUTE') as workspace_access;
+   ```
+
+   Both values should be true. Once the schema and permissions are correct, refresh the API schema cache:
+
+   ```sql
+   notify pgrst, 'reload schema';
+   ```
+
+4. Reload the app. An existing authenticated session can now create/load its workspace; there is no need to create another Google account. If the app targets a different project, correct its environment variables and rebuild/redeploy: Next.js embeds `NEXT_PUBLIC_` variables at build time.
+
+See [Supabase's schema cache refresh guide](https://supabase.com/kb/troubleshooting/refresh-postgrest-schema). Reloading the cache cannot create a missing function or its required tables.
+
 ## 2. Configure authentication
 
 ### Password and phone/email login
